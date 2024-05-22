@@ -39,3 +39,9 @@ GDI(graphics device interface)
 2024.05.21
 -------------
 매끄러운 렌더링을 위해 RECT를 사용 크기 계산 후 adjustwindowrect함수를 ㅏ용
+
+2024.05.22
+-------------
+주제 : texturing
+수정부분-> VertexShader & Pixelshader 에서 Color 부분을 2D 한정 float2 TexCoord(언리얼 마테리얼에서 보이던 함수)로 변경
+InitializeSoene에서 드로우 6점 및 삼각형2개로 사각형을 지정 0~1/ createwictexture 여러함수 중 fromfile로 이미지 파일 로드..
