@@ -50,10 +50,10 @@ InitializeSoene에서 드로우 6점 및 삼각형2개로 사각형을 지정 0~
 -------------
 Vertex를 계속 찍어내는것이 아닌 지수를 사용하여 버택스의 값을 만든 후 buffer를 하나더 생성 후 vertexbuffer를 그린 후 인덱스버퍼를 프레임에 그리고, 버퍼사용시에 D3D11_BUFFER_DESC 클래스와 제로메로리로 초기화 후 그림
 
-2024.05.23
+2024.05.26
 -------------
 vertex를 vertexshade.calss 를 제작 vertexbuffer를 templat으로 제작 다음번 예제는 indexbufferclass 사용
 
-2024.05.24
+2024.05.27
 -------------
 indexbuffer 를 클래스화 시켜서 ifdefine으로 템플릿처럼 사용
