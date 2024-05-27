@@ -35,7 +35,7 @@ void Graphics::RenderFrame()
 	this->deviceContext->PSSetShaderResources(0, 1, this->myTexture.GetAddressOf());
 	this->deviceContext->IASetVertexBuffers(0, 1,vertexBuffer.GetAddressOf(), vertexBuffer.StridePtr(), &offset);
 	this->deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	this->deviceContext->DrawIndexed(6, 0, 0 );
+	this->deviceContext->DrawIndexed(indicesBuffer.BufferSize(), 0, 0);
 
 	//Green Tri
 	/*this->deviceContext->IASetVertexBuffers(0, 1, vertexBuffer2.GetAddressOf(), &stride, &offset);
@@ -267,28 +267,7 @@ bool Graphics::InitializeScene()
 
 	};
 
-	DWORD indices[] =
-	{
-		0,1,2,
-		0,2,3
-	};
-
-	
-	//Load Index Data
-	/*D3D11_BUFFER_DESC vertexBufferDesc;
-	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
-
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(Vertex) * ARRAYSIZE(v);
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA vertexBufferData;
-	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
-	vertexBufferData.pSysMem = v;*/
-
-	//HRESULT hr = this->device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, this->vertexBuffer.GetAddressOf());
+	//Load Vertex Data
 	HRESULT hr = this->vertexBuffer.Initialize(this->device.Get(), v, ARRAYSIZE(v));
 	if (FAILED(hr))
 	{
@@ -296,18 +275,17 @@ bool Graphics::InitializeScene()
 		return false;
 	}
 
-	//Load Index Data
-	D3D11_BUFFER_DESC indexBufferDesc;
-	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(DWORD) * ARRAYSIZE(indices);
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
+	DWORD indices[] =
+	{
+		0,1,2,
+		0,2,3
+	};
 
-	D3D11_SUBRESOURCE_DATA indexBufferData;
-	indexBufferData.pSysMem = indices;
-	hr = device->CreateBuffer(&indexBufferDesc, &indexBufferData, indicesBuffer.GetAddressOf());
+
+	//Load Index Data
+	
+	//hr = device->CreateBuffer(&indexBufferDesc, &indexBufferData, indicesBuffer.GetAddressOf());
+	hr = this->indicesBuffer.Initialize(this->device.Get(), indices, ARRAYSIZE(indices));
 	if (FAILED(hr))
 	{
 		ErrorLogger::Log(hr, "Failed to create indices buffer.");
@@ -321,32 +299,7 @@ bool Graphics::InitializeScene()
 		ErrorLogger::Log(hr, "Failed to create wic texture from file.");
 		return false;
 	}
-	////Triangle 2 (Green)
-	////Triangle Verts
-	//Vertex v2[] =
-	//{
-	//	Vertex(-0.25f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f), //Bottom Left 
-	//	Vertex(0.00f,  0.25f, 0.0f, 0.0f, 1.0f, 0.0f), //Top Middle
-	//	Vertex(0.25f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f), //Bottom Right 
-	//};
 
-	//ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
-
-	//vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	//vertexBufferDesc.ByteWidth = sizeof(Vertex) * ARRAYSIZE(v2);
-	//vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	//vertexBufferDesc.CPUAccessFlags = 0;
-	//vertexBufferDesc.MiscFlags = 0;
-
-	//ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
-	//vertexBufferData.pSysMem = v2;
-
-	//hr = this->device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, this->vertexBuffer2.GetAddressOf());
-	//if (FAILED(hr))
-	//{
-	//	ErrorLogger::Log(hr, "Failed to create vertex buffer.");
-	//	return false;
-	//}
 
 	return true;
 }
