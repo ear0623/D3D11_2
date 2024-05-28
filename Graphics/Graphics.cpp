@@ -31,6 +31,16 @@ void Graphics::RenderFrame()
 	
 	UINT offset = 0;
 
+	//Update Constant Buffer
+	CB_VS_vertexshader data;
+	data.xOffset = 0.0f;
+	data.yOffset = 0.5f;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = this->deviceContext->Map(constantcbuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	CopyMemory(mappedResource.pData, &data, sizeof(CB_VS_vertexshader));
+	this->deviceContext->Unmap(constantcbuffer.Get(), 0);
+	this->deviceContext->VSSetConstantBuffers(0, 1, constantcbuffer.GetAddressOf());
+
 	//Red Tri
 	this->deviceContext->PSSetShaderResources(0, 1, this->myTexture.GetAddressOf());
 	this->deviceContext->IASetVertexBuffers(0, 1,vertexBuffer.GetAddressOf(), vertexBuffer.StridePtr(), &offset);
@@ -48,7 +58,6 @@ void Graphics::RenderFrame()
 
 	this->swapchain->Present(1, NULL);
 }
-
 
 bool Graphics::InitializeDirectX(HWND hwnd, int width, int height)
 {
@@ -251,55 +260,74 @@ bool Graphics::InitializeShaders()
 	if (!pixelshader.Initialize(this->device, shaderfolder + L"pixelshader.cso"))
 		return false;
 
-
 	return true;
 }
 
 bool Graphics::InitializeScene()
 {
-	//Textured Square
-	Vertex v[] =
 	{
-		Vertex(-0.5f,  -0.5f, 1.0f, 0.0f, 1.0f), //Bottom Left   - [0]
-		Vertex(-0.5f,   0.5f, 1.0f, 0.0f, 0.0f), //Top Left      - [1]
-		Vertex(0.5f,   0.5f, 1.0f, 1.0f, 0.0f), //Top Right     - [2]
-		Vertex(0.5f,  -0.5f, 1.0f, 1.0f, 1.0f), //Bottom Right   - [3]
+		//Textured Square
+		Vertex v[] =
+		{
+			Vertex(-0.5f,  -0.5f, 1.0f, 0.0f, 1.0f), //Bottom Left   - [0]
+			Vertex(-0.5f,   0.5f, 1.0f, 0.0f, 0.0f), //Top Left      - [1]
+			Vertex(0.5f,   0.5f, 1.0f, 1.0f, 0.0f), //Top Right     - [2]
+			Vertex(0.5f,  -0.5f, 1.0f, 1.0f, 1.0f), //Bottom Right   - [3]
 
-	};
+		};
 
-	//Load Vertex Data
-	HRESULT hr = this->vertexBuffer.Initialize(this->device.Get(), v, ARRAYSIZE(v));
-	if (FAILED(hr))
-	{
-		ErrorLogger::Log(hr, "Failed to create vertex buffer.");
-		return false;
+		//Load Vertex Data
+		HRESULT hr = this->vertexBuffer.Initialize(this->device.Get(), v, ARRAYSIZE(v));
+		if (FAILED(hr))
+		{
+			ErrorLogger::Log(hr, "Failed to create vertex buffer.");
+			return false;
+		}
+
+		DWORD indices[] =
+		{
+			0,1,2,
+			0,2,3
+		};
+
+
+		//Load Index Data
+
+		//hr = device->CreateBuffer(&indexBufferDesc, &indexBufferData, indicesBuffer.GetAddressOf());
+		hr = this->indicesBuffer.Initialize(this->device.Get(), indices, ARRAYSIZE(indices));
+		if (FAILED(hr))
+		{
+			ErrorLogger::Log(hr, "Failed to create indices buffer.");
+			return hr;
+		}
+
+		//Load Texture
+		hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\piano.png", nullptr, myTexture.GetAddressOf());
+		if (FAILED(hr))
+		{
+			ErrorLogger::Log(hr, "Failed to create wic texture from file.");
+			return false;
+		}
+
+
+		//Initialize Constant Buffer(s)
+		D3D11_BUFFER_DESC desc;
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		desc.MiscFlags = 0;
+		desc.ByteWidth = static_cast<UINT>(sizeof(CB_VS_vertexshader) + (16 - (sizeof(CB_VS_vertexshader) % 16)));
+		desc.StructureByteStride = 0;
+
+		hr = device->CreateBuffer(&desc, 0, constantcbuffer.GetAddressOf());
+		if (FAILED(hr))
+		{
+			ErrorLogger::Log(hr, "Failed to initialize constant buffer.");
+			return false;
+		}
+
+
+		return true;
 	}
-
-	DWORD indices[] =
-	{
-		0,1,2,
-		0,2,3
-	};
-
-
-	//Load Index Data
-	
-	//hr = device->CreateBuffer(&indexBufferDesc, &indexBufferData, indicesBuffer.GetAddressOf());
-	hr = this->indicesBuffer.Initialize(this->device.Get(), indices, ARRAYSIZE(indices));
-	if (FAILED(hr))
-	{
-		ErrorLogger::Log(hr, "Failed to create indices buffer.");
-		return hr;
-	}
-
-	//Load Texture
-	hr = DirectX::CreateWICTextureFromFile(this->device.Get(), L"Data\\Textures\\piano.png", nullptr, myTexture.GetAddressOf());
-	if (FAILED(hr))
-	{
-		ErrorLogger::Log(hr, "Failed to create wic texture from file.");
-		return false;
-	}
-
-
-	return true;
 }
+
