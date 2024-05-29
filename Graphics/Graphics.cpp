@@ -41,7 +41,8 @@ void Graphics::RenderFrame()
 	this->deviceContext->Unmap(constantcbuffer.Get(), 0);
 	this->deviceContext->VSSetConstantBuffers(0, 1, constantcbuffer.GetAddressOf());
 
-	//Red Tri
+
+	//Square
 	this->deviceContext->PSSetShaderResources(0, 1, this->myTexture.GetAddressOf());
 	this->deviceContext->IASetVertexBuffers(0, 1,vertexBuffer.GetAddressOf(), vertexBuffer.StridePtr(), &offset);
 	this->deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
