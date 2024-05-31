@@ -7,7 +7,7 @@
 #include <WICTextureLoader.h>
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "ConstantBufferTypes.h"
+#include "ConstantBuffer.h"
 
 class Graphics
 {
@@ -27,7 +27,8 @@ private:
 
 	VertexShader vertexshader;
 	PixelShader pixelshader;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constantcbuffer;
+	ConstantBuffer<CB_VS_vertexshader> constantBuffer;
+
 
 	VertexBuffer<Vertex> vertexBuffer;
 	IndexBuffer indicesBuffer;

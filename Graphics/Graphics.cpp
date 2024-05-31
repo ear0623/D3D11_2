@@ -32,15 +32,15 @@ void Graphics::RenderFrame()
 	UINT offset = 0;
 
 	//Update Constant Buffer
-	CB_VS_vertexshader data;
-	data.xOffset = 0.0f;
-	data.yOffset = 0.5f;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	HRESULT hr = this->deviceContext->Map(constantcbuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &data, sizeof(CB_VS_vertexshader));
-	this->deviceContext->Unmap(constantcbuffer.Get(), 0);
-	this->deviceContext->VSSetConstantBuffers(0, 1, constantcbuffer.GetAddressOf());
+	constantBuffer.data.mat = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f) * DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+	constantBuffer.data.mat = DirectX::XMMatrixTranslation(0.0f, -0.5f, 0.0f);
+	constantBuffer.data.mat = DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f,DirectX::XM_PIDIV2);
+	constantBuffer.data.mat = DirectX::XMMatrixTranspose(constantBuffer.data.mat);
+	
+	if (!constantBuffer.ApplyChanges())
+		return;
 
+	this->deviceContext->VSSetConstantBuffers(0, 1, this->constantBuffer.GetAddressOf());
 
 	//Square
 	this->deviceContext->PSSetShaderResources(0, 1, this->myTexture.GetAddressOf());
@@ -312,15 +312,7 @@ bool Graphics::InitializeScene()
 
 
 		//Initialize Constant Buffer(s)
-		D3D11_BUFFER_DESC desc;
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-		desc.ByteWidth = static_cast<UINT>(sizeof(CB_VS_vertexshader) + (16 - (sizeof(CB_VS_vertexshader) % 16)));
-		desc.StructureByteStride = 0;
-
-		hr = device->CreateBuffer(&desc, 0, constantcbuffer.GetAddressOf());
+		hr = this->constantBuffer.Initialize(this->device.Get(), this->deviceContext.Get());
 		if (FAILED(hr))
 		{
 			ErrorLogger::Log(hr, "Failed to initialize constant buffer.");
