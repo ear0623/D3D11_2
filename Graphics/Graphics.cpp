@@ -37,7 +37,8 @@ void Graphics::RenderFrame()
 	//Update Constant Buffer
 	DirectX::XMMATRIX world = XMMatrixIdentity();
 	
-	camera.AdjustPosition(0.0f, 0.01f, 0.0f);
+	/*camera.AdjustPosition(0.01f, 0.01f, 0.01f);
+	camera.SetLookatPos(XMFLOAT3(0.0f, 0.0f, 0.0f));*/
 
 
 	constantBuffer.data.mat = world*camera.GetViewMatrix()*camera.GetProjectionMatrix();
@@ -67,7 +68,7 @@ void Graphics::RenderFrame()
 	spriteFont->DrawString(spriteBatch.get(), L"HELLO WORLD", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
 	spriteBatch->End();
 
-	this->swapchain->Present(1, NULL);
+	this->swapchain->Present(0, NULL);
 }
 
 bool Graphics::InitializeDirectX(HWND hwnd)
