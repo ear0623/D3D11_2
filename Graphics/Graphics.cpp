@@ -5,6 +5,8 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 
 	this->windowWidth = width;
 	this->windowheight = height;
+	this->fpsTimer.Start();
+
 	if (!InitializeDirectX(hwnd))
 		return false;
 
@@ -13,6 +15,14 @@ bool Graphics::Initialize(HWND hwnd, int width, int height)
 
 	if (!InitializeScene())
 		return false;
+
+	//SetupImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplDX11_Init(this->device.Get(),this->deviceContext.Get());
+	ImGui::StyleColorsDark();
 
 	return true;
 }
@@ -64,9 +74,31 @@ void Graphics::RenderFrame()
 	this->deviceContext->Draw(3, 0);*/
 
 	//Draw text
+	static int fpsCounter = 0;
+	static std::string fpsString = "FPS : 0";
+	fpsCounter += 1;
+	if (fpsTimer.GetMilisecondsElapsed() > 1000.0)
+	{
+		fpsString = "FPS  : " + std::to_string(fpsCounter);
+		fpsTimer.Restart();
+	}
 	spriteBatch->Begin();
-	spriteFont->DrawString(spriteBatch.get(), L"HELLO WORLD", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+	spriteFont->DrawString(spriteBatch.get(),StringConverter::StringToWide(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
 	spriteBatch->End();
+
+
+	//Start the dear ImGui Frame
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+
+	ImGui::NewFrame();
+	//Create Imgui Test Window
+	ImGui::Begin("Test");
+	ImGui::End();
+	//Assemble Together Draw data
+	ImGui::Render();
+	//RenderDrawData
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	this->swapchain->Present(0, NULL);
 }
@@ -271,6 +303,8 @@ bool Graphics::InitializeShaders()
 	
 	if (!pixelshader.Initialize(this->device, shaderfolder + L"pixelshader.cso"))
 		return false;
+
+
 
 	return true;
 }

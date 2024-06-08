@@ -9,6 +9,10 @@
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
 #include "Camera.h"
+#include "Timer.h"
+#include "IMGui/imgui.h"
+#include "IMGui/imgui_impl_dx11.h"
+#include "IMGui/imgui_impl_win32.h"
 
 class Graphics
 {
@@ -51,6 +55,6 @@ private:
 
 	int windowWidth = 0;
 	int windowheight = 0;
-	
+	Timer fpsTimer;
 
 };
