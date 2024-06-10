@@ -45,7 +45,8 @@ void Graphics::RenderFrame()
 	UINT offset = 0;
 
 	//Update Constant Buffer
-	DirectX::XMMATRIX world = XMMatrixIdentity();
+	static float translationOffset[3] = { 0,0,0 };
+	XMMATRIX world = XMMatrixTranslation(translationOffset[0], translationOffset[1], translationOffset[2]);
 	
 	/*camera.AdjustPosition(0.01f, 0.01f, 0.01f);
 	camera.SetLookatPos(XMFLOAT3(0.0f, 0.0f, 0.0f));*/
@@ -86,7 +87,7 @@ void Graphics::RenderFrame()
 	spriteFont->DrawString(spriteBatch.get(),StringConverter::StringToWide(fpsString).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
 	spriteBatch->End();
 
-
+	static int counter = 0;
 	//Start the dear ImGui Frame
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -94,6 +95,13 @@ void Graphics::RenderFrame()
 	ImGui::NewFrame();
 	//Create Imgui Test Window
 	ImGui::Begin("Test");
+	ImGui::Text("this is example text.");
+	if (ImGui::Button("Click Me!"))
+		counter++;
+	ImGui::SameLine();
+	std::string clickCount = "Click Count : " + std::to_string(counter);
+	ImGui::Text(clickCount.c_str());
+	ImGui::DragFloat3("Translation X/Y/Z",translationOffset,0.1f,-5.0f,5.0f);
 	ImGui::End();
 	//Assemble Together Draw data
 	ImGui::Render();
