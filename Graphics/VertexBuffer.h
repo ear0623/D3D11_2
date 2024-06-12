@@ -44,7 +44,7 @@ public:
 
 	HRESULT Initialize(ID3D11Device* device, T* data, UINT numVertices)
 	{
-		if (buffer.Get() !- nullptr)
+		if (buffer.Get() != nullptr)
 			buffer.Reset();
 		this->bufferSize = numVertices;
 		if (this->stride.get() == nullptr)
