@@ -1,18 +1,15 @@
 #pragma once
 #include "AdapterReader.h"
 #include "Shaders.h"
-#include "Vertex.h"
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
 #include <WICTextureLoader.h>
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "ConstantBuffer.h"
 #include "Camera.h"
 #include "Timer.h"
 #include "IMGui/imgui.h"
 #include "IMGui/imgui_impl_dx11.h"
 #include "IMGui/imgui_impl_win32.h"
+#include "Model.h"
 
 class Graphics
 {
@@ -20,6 +17,7 @@ public:
 	bool Initialize(HWND hwnd, int width, int height);
 	void RenderFrame();
 	Camera camera;
+	Model model;
 
 private:
 	bool InitializeDirectX(HWND hwnd);
@@ -38,6 +36,7 @@ private:
 	ConstantBuffer<CB_PS_pixelshader> cb_ps_pixelshader;
 
 
+
 	VertexBuffer<Vertex> vertexBuffer;
 	IndexBuffer indicesBuffer;
 	//Microsoft::WRL::ComPtr<ID3D11Buffer> indicesBuffer;
@@ -47,13 +46,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState_CullFront;
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
 
 	std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
 	std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> myTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pinkTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
 
 	int windowWidth = 0;
 	int windowheight = 0;
